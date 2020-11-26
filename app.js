@@ -1,12 +1,29 @@
-export default function(express, bodyParser, createReadStream, crypto, http) {
+export default function(express, bodyParser, createReadStream, crypto, http, m, UserSchema) {
     const app = express();
+    const User = m.model('User', UserSchema);
+
     const CORS = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,OPTIONS,DELETE',
         'Access-Control-Allow-Headers': 'Content-Type, Accept, Access-Control-Allow-Headers',
         'Content-Type': 'text/plain; charset=utf-8'
     };
+
+    
     const login = 'moskalev27';
+    
+       app.post('/insert/', async (req, res) => {
+        const { URL, login, password } = req.body;
+        try {
+          await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
+        } catch (e) {
+          res.send(e.stack);   
+        }
+
+        const newUser = new User({ login, password });
+        await newUser.save();
+        res.status(201).json({ successsss: true, login });
+    });
     app
         .use(bodyParser.urlencoded({extend: true}))
         .all('/login/', (req, res) => {
@@ -53,6 +70,7 @@ export default function(express, bodyParser, createReadStream, crypto, http) {
             res.set(CORS);
             res.send(login);
         });
+        
 
     return app;
 }
