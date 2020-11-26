@@ -11,8 +11,15 @@ export default function(express, bodyParser, createReadStream, crypto, http, m, 
 
     
     const login = 'moskalev27';
-    
-       app.post('/insert/', async (req, res) => {
+
+    app
+        .use(bodyParser.urlencoded({extend: true}))
+        .all('/login/', (req, res) => {
+            res.set(CORS);
+            res.send(login);
+        })
+
+        .post('/insert/', async (req, res) => {
         const { URL, login, password } = req.body;
         try {
           await m.connect(URL, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -23,13 +30,7 @@ export default function(express, bodyParser, createReadStream, crypto, http, m, 
         const newUser = new User({ login, password });
         await newUser.save();
         res.status(201).json({ successsss: true, login });
-    });
-    app
-        .use(bodyParser.urlencoded({extend: true}))
-        .all('/login/', (req, res) => {
-            res.set(CORS);
-            res.send(login);
-        })
+        })   
 
         .all('/code/', (req, res) => {
             res.set(CORS);
